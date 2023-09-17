@@ -33,8 +33,8 @@ public class MixinChunkStreamVersion {
             return new ChunkStreamVersion(id, in -> new InflaterInputStream(in, new Inflater(), 16 * 1024), out -> new DeflaterOutputStream(out, new Deflater(), 16 * 1024));
         } else if (id == 3) { // UNCOMPRESSED
             return new ChunkStreamVersion(id, BufferedInputStream::new, BufferedOutputStream::new);
-        } else if (id == 4) { // zstd
-            return new ChunkStreamVersion(id, in -> new ZstdInputStream(in), out -> new ZstdOutputStream(out));
+        } else if (id == 4) { // ZSTD
+            return new ChunkStreamVersion(id, ZstdInputStream::new, ZstdOutputStream::new);
         } else {
             return new ChunkStreamVersion(id, inputStreamWrapper, outputStreamWrapper);
         }

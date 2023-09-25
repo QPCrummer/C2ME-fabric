@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.longs.Long2ReferenceLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtTagSizeTracker;
 import net.minecraft.nbt.scanner.NbtScanner;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.storage.RegionBasedStorage;
@@ -216,10 +217,10 @@ public class C2MEStorageThread extends Thread {
                                 try {
                                     final DataInputStream input = new DataInputStream(new ByteArrayInputStream(cached.right().get()));
                                     if (scanner != null) {
-                                        NbtIo.scan(input, scanner);
+                                        NbtIo.scan(input, scanner, NbtTagSizeTracker.ofUnlimitedBytes());
                                         return null;
                                     } else {
-                                        final NbtCompound compound = NbtIo.read(input);
+                                        final NbtCompound compound = NbtIo.readCompound(input);
                                         return compound;
                                     }
                                 } catch (IOException e) {
@@ -282,10 +283,10 @@ public class C2MEStorageThread extends Thread {
                 try {
                     try (DataInputStream inputStream = chunkInputStream) {
                         if (scanner != null) {
-                            NbtIo.scan(inputStream, scanner);
+                            NbtIo.scan(inputStream, scanner, NbtTagSizeTracker.ofUnlimitedBytes());
                             return null;
                         } else {
-                            return NbtIo.read(inputStream);
+                            return NbtIo.readCompound(inputStream);
                         }
                     }
                 } catch (Throwable t) {

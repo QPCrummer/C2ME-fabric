@@ -45,57 +45,61 @@ public final class StarLightQueue {
         }
     }
 
-    public CompletableFuture<Void> queueBlockChange(final BlockPos pos) {
+    public ChunkTaskSet queueBlockChange(final BlockPos pos) {
         synchronized (this.schedulingMutex) {
             final ChunkTaskSet tasks = this.chunkTasks.computeIfAbsent(ChunkPos.toLong(pos), ChunkTaskSet::new);
             tasks.changedPositions.add(pos.toImmutable());
-            return tasks.onComplete;
+            return tasks;
         }
     }
 
-    public CompletableFuture<Void> queueSectionChange(final ChunkSectionPos pos, final boolean newEmptyValue) {
+    public ChunkTaskSet queueSectionChange(final ChunkSectionPos pos, final boolean newEmptyValue) {
         synchronized (this.schedulingMutex) {
-            final ChunkTaskSet tasks = this.chunkTasks.computeIfAbsent(ChunkPos.toLong(pos.getSectionX(), pos.getSectionZ()), ChunkTaskSet::new);
+            ChunkTaskSet tasks = this.chunkTasks.computeIfAbsent(ChunkPos.toLong(pos.getSectionX(), pos.getSectionZ()), ChunkTaskSet::new);
             if (tasks.changedSectionSet == null) {
                 tasks.changedSectionSet = new Boolean[((IStarLightInterface) (Object) this.manager).getMaxSection() - ((IStarLightInterface) (Object) this.manager).getMinSection() + 1];
             }
+
             tasks.changedSectionSet[pos.getY() - ((IStarLightInterface) (Object) this.manager).getMinSection()] = Boolean.valueOf(newEmptyValue);
-            return tasks.onComplete;
+            return tasks;
         }
     }
 
-    public CompletableFuture<Void> queueChunkLighting(final ChunkPos pos, final Runnable lightTask) {
+    public ChunkTaskSet queueChunkLighting(final ChunkPos pos, final Runnable lightTask) {
         synchronized (this.schedulingMutex) {
             final ChunkTaskSet tasks = this.chunkTasks.computeIfAbsent(pos.toLong(), ChunkTaskSet::new);
             if (tasks.lightTasks == null) {
                 tasks.lightTasks = new ArrayList<>();
             }
+
             tasks.lightTasks.add(lightTask);
-            return tasks.onComplete;
+            return tasks;
         }
     }
 
-    public CompletableFuture<Void> queueChunkSkylightEdgeCheck(final ChunkSectionPos pos, final ShortCollection sections) {
+    public ChunkTaskSet queueChunkSkylightEdgeCheck(final ChunkSectionPos pos, final ShortCollection sections) {
         synchronized (this.schedulingMutex) {
             final ChunkTaskSet tasks = this.chunkTasks.computeIfAbsent(ChunkPos.toLong(pos.getSectionX(), pos.getSectionZ()), ChunkTaskSet::new);
             ShortOpenHashSet queuedEdges = tasks.queuedEdgeChecksSky;
             if (queuedEdges == null) {
                 queuedEdges = tasks.queuedEdgeChecksSky = new ShortOpenHashSet();
             }
+
             queuedEdges.addAll(sections);
-            return tasks.onComplete;
+            return tasks;
         }
     }
 
-    public CompletableFuture<Void> queueChunkBlocklightEdgeCheck(final ChunkSectionPos pos, final ShortCollection sections) {
+    public ChunkTaskSet queueChunkBlocklightEdgeCheck(final ChunkSectionPos pos, final ShortCollection sections) {
         synchronized (this.schedulingMutex) {
             final ChunkTaskSet tasks = this.chunkTasks.computeIfAbsent(ChunkPos.toLong(pos.getSectionX(), pos.getSectionZ()), ChunkTaskSet::new);
             ShortOpenHashSet queuedEdges = tasks.queuedEdgeChecksBlock;
             if (queuedEdges == null) {
                 queuedEdges = tasks.queuedEdgeChecksBlock = new ShortOpenHashSet();
             }
+
             queuedEdges.addAll(sections);
-            return tasks.onComplete;
+            return tasks;
         }
     }
 
@@ -250,7 +254,7 @@ public final class StarLightQueue {
         }
     }
 
-    public static final class ChunkTaskSet {
+    public static class ChunkTaskSet {
 
         public final Set<BlockPos> changedPositions = new ObjectOpenHashSet<>();
         public Boolean[] changedSectionSet;

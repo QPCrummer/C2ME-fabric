@@ -8,13 +8,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkProvider;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-
-import java.util.concurrent.CompletableFuture;
+import org.spongepowered.asm.mixin.*;
 
 @Mixin(StarLightInterface.class)
 public class MixinStarLightInterface {
@@ -38,7 +32,7 @@ public class MixinStarLightInterface {
      * @reason threaded starlight
      */
     @Overwrite(remap = false)
-    public CompletableFuture<Void> blockChange(BlockPos pos) {
+    public StarLightInterface.LightQueue.ChunkTasks blockChange(BlockPos pos) {
         if (this.world != null && pos.getY() >= WorldUtil.getMinBlockY(this.world) && pos.getY() <= WorldUtil.getMaxBlockY(this.world)) {
             return this.c2me$starlightQueue.queueBlockChange(pos);
         } else {
@@ -51,7 +45,7 @@ public class MixinStarLightInterface {
      * @reason threaded starlight
      */
     @Overwrite(remap = false)
-    public CompletableFuture<Void> sectionChange(ChunkSectionPos pos, boolean newEmptyValue) {
+    public StarLightInterface.LightQueue.ChunkTasks sectionChange(ChunkSectionPos pos, boolean newEmptyValue) {
         if (this.world != null) {
             return this.c2me$starlightQueue.queueSectionChange(pos, newEmptyValue);
         } else {

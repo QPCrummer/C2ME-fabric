@@ -122,6 +122,7 @@ configure (allprojects - project(":tests")) {
         implementation "org.threadly:threadly:${threadly_version}"
         implementation "net.objecthunter:exp4j:${exp4j_version}"
         implementation "com.github.LlamaLad7:MixinExtras:${mixinextras_version}"
+        implementation("com.github.luben:zstd-jni:${zstd_jni_version}")
 
         annotationProcessor "com.github.LlamaLad7:MixinExtras:${mixinextras_version}"
     }
@@ -152,6 +153,7 @@ dependencies {
     include implementation("org.threadly:threadly:${threadly_version}")
     include implementation("net.objecthunter:exp4j:${exp4j_version}")
     include implementation("com.github.LlamaLad7:MixinExtras:${mixinextras_version}")
+    include implementation("com.github.luben:zstd-jni:${zstd_jni_version}")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

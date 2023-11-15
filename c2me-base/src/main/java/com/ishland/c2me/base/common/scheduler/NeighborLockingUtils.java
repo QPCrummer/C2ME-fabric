@@ -3,6 +3,7 @@ package com.ishland.c2me.base.common.scheduler;
 import com.google.common.base.Preconditions;
 import com.ibm.asyncutil.locks.AsyncLock;
 import com.ishland.c2me.base.common.GlobalExecutors;
+import com.ishland.flowsched.executor.LockToken;
 import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import net.minecraft.server.world.ChunkHolder;
@@ -26,11 +27,9 @@ public class NeighborLockingUtils {
 //            return StageSupport.tryWith(chunkLock.acquireLock(target), unused -> action.get()).toCompletableFuture().thenCompose(Function.identity());
 
         if (status == ChunkStatus.LIGHT) {
-            return new LockFreeTask<>(
-                    schedulingManager,
-                    target.toLong(),
-                    action,
-                    async
+            return new SimpleCompletableFutureTask(
+                    action.get(),
+                    Thread.NORM_PRIORITY - 1
             ).getFuture();
         }
 
@@ -62,15 +61,12 @@ public class NeighborLockingUtils {
             for (int z = target.z - radius; z <= target.z + radius; z++)
                 lockTargets.add(ChunkPos.toLong(x, z));
 
-        final NeighborLockingTask<T> task = new NeighborLockingTask<>(
-                schedulingManager,
+        // TODO Fix this
+        final ScheduledTask<T> task = new ScheduledTask<>(
                 target.toLong(),
-                lockTargets.toLongArray(),
-                isCancelled,
                 action,
-                "%s %s".formatted(target.toString(), status),
-                async
-        );
+                lockTargets.toArray(LockToken[]::new));
+        schedulingManager.enqueue(task);
         return task.getFuture();
     }
 
@@ -83,7 +79,8 @@ public class NeighborLockingUtils {
         PARALLELIZED() {
             @Override
             public CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>> runTask(AsyncLock lock, Supplier<CompletableFuture<Either<Chunk, ChunkHolder.Unloaded>>> completableFuture) {
-                return CompletableFuture.supplyAsync(completableFuture, GlobalExecutors.executor).thenCompose(Function.identity());
+                // TODO Find correct priority
+                return CompletableFuture.supplyAsync(completableFuture, GlobalExecutors.prioritizedScheduler.executor(Thread.NORM_PRIORITY - 1)).thenCompose(Function.identity());
             }
         },
         SINGLE_THREADED() {
@@ -96,7 +93,8 @@ public class NeighborLockingUtils {
                     } finally {
                         lockToken.releaseLock();
                     }
-                }, GlobalExecutors.executor);
+                    // TODO Find correct priority
+                }, GlobalExecutors.prioritizedScheduler.executor(Thread.NORM_PRIORITY - 1));
             }
         },
         AS_IS() {

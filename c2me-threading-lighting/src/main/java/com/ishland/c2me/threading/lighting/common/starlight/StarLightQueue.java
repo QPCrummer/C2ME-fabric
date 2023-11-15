@@ -168,6 +168,7 @@ public final class StarLightQueue {
 
     private void scheduleAsync0(StarLightInterface.LightQueue.ChunkTasks taskSet, SchedulingManager schedulingManager) {
         if (this.scheduledChunks.get(taskSet.chunkCoordinate) != null) throw new AssertionError();
+
         final CompletableFuture<Void> future = NeighborLockingUtils.runChunkGenWithLock(
                 new ChunkPos(taskSet.chunkCoordinate),
                 ChunkStatus.FULL, // only used as a hint
@@ -192,7 +193,8 @@ public final class StarLightQueue {
                             ((IStarLightInterface) (Object) this.manager).invokeReleaseBlockLightEngine(blockStarLightEngine);
                     }
                     return taskSet.onComplete;
-                }, GlobalExecutors.executor).thenCompose(Function.identity())
+                    // TODO Figure out proper priority
+                }, GlobalExecutors.prioritizedScheduler.executor(Thread.NORM_PRIORITY - 1)).thenCompose(Function.identity())
         );
         this.scheduledChunks.put(taskSet.chunkCoordinate, future);
         future.whenComplete((unused, throwable) -> {

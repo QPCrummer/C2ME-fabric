@@ -24,6 +24,9 @@ allprojects {
             content { includeGroup "curse.maven" }
         }
     }
+    loom {
+        accessWidenerPath = project(":c2me-base").file("src/main/resources/c2me-base.accesswidener")
+    }
     afterEvaluate {
         migrateMappings.configure {
             outputDir = project.file("src/main/java")

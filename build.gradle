@@ -36,6 +36,8 @@ configure(allprojects) {
 
 archivesBaseName = "${project.archives_base_name}-mc${project.minecraft_version}"
 
+clean.dependsOn gradle.includedBuild('FlowSched').task(':clean')
+
 configure (allprojects - project(":tests")) {
     if (project != project(":") && project.parent != project(":")) return
 
@@ -54,10 +56,9 @@ configure (allprojects - project(":tests")) {
     }
 
     loom {
-        def awFile = file("src/main/resources/${project.name}.accesswidener")
-        if (awFile.isFile()) {
-            accessWidenerPath = awFile
-        }
+        def file = project(":c2me-base").file("src/main/resources/c2me-base.accesswidener")
+        accessWidenerPath = file
+//        logger.lifecycle(String.format("%s: Using access widener at %s", project, file.getAbsolutePath()))
         runs {
             server {
                 ideConfigGenerated project.rootProject == project
@@ -121,6 +122,8 @@ configure (allprojects - project(":tests")) {
         implementation "net.objecthunter:exp4j:${exp4j_version}"
         implementation "com.github.LlamaLad7:MixinExtras:${mixinextras_version}"
         implementation("com.github.luben:zstd-jni:${zstd_jni_version}")
+        implementation "com.github.QPCrummer:FlowSched:60cfca9167"
+
 
         annotationProcessor "com.github.LlamaLad7:MixinExtras:${mixinextras_version}"
     }
@@ -130,6 +133,7 @@ subprojects {
     afterEvaluate {
         afterEvaluate {
             genSourcesWithFernFlower.enabled = false
+            genSourcesWithVineflower.enabled = false
             genSourcesWithCfr.enabled = false
             downloadAssets.enabled = false
         }
@@ -151,6 +155,7 @@ dependencies {
     include implementation("net.objecthunter:exp4j:${exp4j_version}")
     include implementation("com.github.LlamaLad7:MixinExtras:${mixinextras_version}")
     include implementation("com.github.luben:zstd-jni:${zstd_jni_version}")
+    include implementation("com.github.QPCrummer:FlowSched:60cfca9167")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

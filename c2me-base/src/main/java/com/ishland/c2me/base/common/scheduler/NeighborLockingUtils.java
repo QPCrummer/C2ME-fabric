@@ -26,13 +26,6 @@ public class NeighborLockingUtils {
 //        if (radius == 0)
 //            return StageSupport.tryWith(chunkLock.acquireLock(target), unused -> action.get()).toCompletableFuture().thenCompose(Function.identity());
 
-        if (status == ChunkStatus.LIGHT) {
-            return new SimpleCompletableFutureTask(
-                    action.get(),
-                    Thread.NORM_PRIORITY - 1
-            ).getFuture();
-        }
-
         BooleanSupplier isCancelled;
 
         if (holder != null && status != null) {

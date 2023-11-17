@@ -136,7 +136,7 @@ public final class StarLightQueue {
                         final StarLightInterface.LightQueue.ChunkTasks taskSet = entry.getValue();
                         iterator.remove();
                         this.scheduledChunks.remove(pos);
-                        scheduleAsync0(taskSet, schedulingManager);
+                        newScheduleAsync0(taskSet, schedulingManager);
                     }
                 }
             }
@@ -193,8 +193,8 @@ public final class StarLightQueue {
                             ((IStarLightInterface) (Object) this.manager).invokeReleaseBlockLightEngine(blockStarLightEngine);
                     }
                     return taskSet.onComplete;
-                    // TODO Figure out proper priority
-                }, GlobalExecutors.prioritizedScheduler.executor(Thread.NORM_PRIORITY - 1)).thenCompose(Function.identity())
+                    // TODO See if this works
+                }, schedulingManager.positionedExecutor(taskSet.chunkCoordinate)).thenCompose(Function.identity())
         );
         this.scheduledChunks.put(taskSet.chunkCoordinate, future);
         future.whenComplete((unused, throwable) -> {
@@ -214,6 +214,27 @@ public final class StarLightQueue {
             } catch (Throwable t) {
                 t.printStackTrace();
                 throw new RuntimeException(t);
+            }
+        });
+    }
+
+    // TODO It seems to work, but I know I did it wrong
+    private void newScheduleAsync0(StarLightInterface.LightQueue.ChunkTasks taskSet, SchedulingManager schedulingManager) {
+        schedulingManager.enqueue(taskSet.chunkCoordinate, () -> {
+            SkyStarLightEngine skyStarLightEngine = null;
+            BlockStarLightEngine blockStarLightEngine = null;
+            try {
+                //noinspection DataFlowIssue
+                skyStarLightEngine = ((IStarLightInterface) (Object) this.manager).invokeGetSkyLightEngine();
+                blockStarLightEngine = ((IStarLightInterface) (Object) this.manager).invokeGetBlockLightEngine();
+                this.handleUpdateInternal(skyStarLightEngine, blockStarLightEngine, taskSet);
+            } finally {
+                //noinspection ConstantValue
+                if (skyStarLightEngine != null)
+                    ((IStarLightInterface) (Object) this.manager).invokeReleaseSkyLightEngine(skyStarLightEngine);
+                //noinspection ConstantValue
+                if (blockStarLightEngine != null)
+                    ((IStarLightInterface) (Object) this.manager).invokeReleaseBlockLightEngine(blockStarLightEngine);
             }
         });
     }

@@ -2,9 +2,13 @@
   "parent": "c2me.mixins.json",
   "required": true,
   "package": "com.ishland.c2me.threading.lighting.mixin",
-  "plugin": "com.ishland.c2me.base.common.ModuleMixinPlugin",
+  "plugin": "com.ishland.c2me.threading.lighting.MixinPlugin",
   "mixins": [
     "MixinServerLightingProvider",
-    "MixinThreadedAnvilChunkStorage"
+    "MixinThreadedAnvilChunkStorage",
+    "starlight.MixinChunkStatus",
+    "starlight.MixinServerLightingProvider",
+    "starlight.MixinStarLightInterface",
+    "starlight.access.IStarLightInterface"
   ]
 }

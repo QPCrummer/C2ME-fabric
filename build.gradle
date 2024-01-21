@@ -122,6 +122,8 @@ configure (allprojects - project(":tests")) {
         implementation "org.threadly:threadly:${threadly_version}"
         implementation "net.objecthunter:exp4j:${exp4j_version}"
         implementation "com.ishland.flowsched:flowsched"
+        implementation "io.github.llamalad7:mixinextras-fabric:${mixinextras_version}"
+        implementation("com.github.luben:zstd-jni:${zstd_jni_version}")
 
     }
 }
@@ -150,7 +152,9 @@ dependencies {
     include implementation("com.electronwill.night-config:core:${night_config_version}")
     include implementation("org.threadly:threadly:${threadly_version}")
     include implementation("net.objecthunter:exp4j:${exp4j_version}")
-//    include implementation("com.ishland.flowsched:flowsched")
+    //include implementation("com.ishland.flowsched:flowsched")
+    include implementation("io.github.llamalad7:mixinextras-fabric:${mixinextras_version}")
+    include implementation("com.github.luben:zstd-jni:${zstd_jni_version}")
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.

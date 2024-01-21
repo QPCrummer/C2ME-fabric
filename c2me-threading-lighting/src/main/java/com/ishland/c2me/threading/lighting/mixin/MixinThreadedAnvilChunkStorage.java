@@ -7,6 +7,7 @@ import net.minecraft.util.thread.TaskExecutor;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -23,7 +24,8 @@ public class MixinThreadedAnvilChunkStorage {
 
     @Shadow
     @Final
-    private ServerWorld world;
+    ServerWorld world;
+    @Unique
     private ExecutorService lightThread = null;
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/thread/TaskExecutor;create(Ljava/util/concurrent/Executor;Ljava/lang/String;)Lnet/minecraft/util/thread/TaskExecutor;"))

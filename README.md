@@ -8,6 +8,10 @@
 <h3>A Fabric mod designed to improve the chunk performance of Minecraft.</h3>
 </div>
 
+## The everything branch
+The "everything" branch combines Flowsched, Threaded Starlight, and ZSTD all into one build. 
+Here be dragons! This is not heavily tested and should probably not be used in production!
+
 ## So what is C2ME?
 C^2M-Engine, or C2ME for short, is a Fabric mod designed to improve the performance of chunk generation, I/O, and loading. This is done by taking advantage of multiple CPU cores in parallel. For the best performance it is recommended to use C2ME with [Lithium](https://github.com/CaffeineMC/lithium-fabric) and [Starlight](https://github.com/Spottedleaf/Starlight).
 
@@ -20,11 +24,9 @@ Although it is usable in most cases and tested during build time, it doesn't mea
 So backup your worlds and practice good game modding skills.
 
 ## Branch development status
-| Branch            | Status                               |
-|-------------------|--------------------------------------|
-| fabric/ver/1.20.1 | Active, Mainline                     |
-| fabric/ver/1.19.4 | Bugfixes only                        |
-| fabric/ver/1.18   | Bugfixes only                        |
+| Branch            | Status           |
+|-------------------|------------------|
+ | everything/1.20.4 | Active, Mainline |
 
 
 ## Downloads
